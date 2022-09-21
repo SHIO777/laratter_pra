@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Tweet;
+use Auth;
+
 
 class TweetController extends Controller
 {
@@ -15,7 +17,11 @@ class TweetController extends Controller
      */
     public function index()
     {
-        return view('tweet.index');
+        // $tweets = [];
+        // ddd($tweets);
+        $tweets = Tweet::getAllOrderByUpdated_at();
+        // ddd($tweets);
+        return view('tweet.index', compact('tweets'));
     }
 
     /**
@@ -36,7 +42,32 @@ class TweetController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // validation and register data to DB
+        // バリデーション
+        $validator = Validator::make($request->all(), [
+            'tweet' => 'required | max:191',
+            'description' => 'required',
+        ]);
+        // バリデーション:エラー
+        // ddd($request);           // requestには色々データ入ってる
+        if ($validator->fails()) {
+            return redirect()
+            ->route('tweet.create')
+            ->withInput()
+            ->withErrors($validator);
+        }
+
+        // create()は最初から用意されている関数
+        // 戻り値は挿入されたレコードの情報
+        // 6.13 フォームから送信されてきたデータとユーザーIDをマージし，
+        // DBにinsertする
+        $data = $request->merge(['user_id' => Auth::user()->id])->all();
+        // ddd($data);
+        // ddd(Auth::user());
+        $result = Tweet::create($data);
+
+        // ルーティング「tweet.index」にリクエスト送信（一覧ページに移動）
+        return redirect()->route('tweet.index');
     }
 
     /**
@@ -47,7 +78,8 @@ class TweetController extends Controller
      */
     public function show($id)
     {
-        //
+        $tweet = Tweet::find($id);
+        return view('tweet.show', compact('tweet'));
     }
 
     /**
@@ -58,7 +90,8 @@ class TweetController extends Controller
      */
     public function edit($id)
     {
-        //
+        $tweet = Tweet::find($id);
+        return view('tweet.edit', compact('tweet'));
     }
 
     /**
@@ -70,7 +103,21 @@ class TweetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // validation
+        $validator = Validator::make($request->all(), [
+            'tweet' => 'required | max:191',
+            'description' => 'required',
+        ]);
+        // validation error
+        if ($validator->fails()) {
+            return redirect()
+                ->route('tweet.edit', $id)
+                ->withInput()
+                ->withErrors($validator);
+        }
+        // data updating process
+        $result = Tweet::find($id)->update($request->all());
+        return redirect()->route('tweet.index');
     }
 
     /**
@@ -81,6 +128,7 @@ class TweetController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $result = Tweet::find($id)->delete();
+        return redirect()->route('tweet.index');
     }
 }
