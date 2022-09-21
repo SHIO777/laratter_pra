@@ -28,6 +28,30 @@
                     </a>
 
                   <div class="flex">
+                    {{-- favorite状態で条件分岐 --}}
+                    @if ($tweet->users()->where('user_id', Auth::id())->exists())
+                    {{-- unfavorite button --}}
+                    <form action="{{ route('unfavorites', $tweet) }}" method="POST" class="text-left">
+                      @csrf
+                      <button type="submit" class="flex mr-2 ml-2 text-sm hover:bg-gray-200 hover:shadow-none text-red py-1 px-2 focus:outline-none focus:shadow-outline">
+                        <svg class="h-6 w-6 text-red-500" fill="red" viewBox="0 0 24 24" stroke="red">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {{ $tweet->users()->count() }}
+                      </button>
+                    </form>
+                    @else
+                    {{-- favorite button --}}
+                    <form action="{{ route('favorites', $tweet) }}" method="POST" class="text-left">
+                      @csrf
+                      <button type="submit" class="flex mr-2 ml-2 text-sm hover:bg-gray-200 hover:shadow-none text-black py-1 px-2 focus:outline-none focus:shadow-outline">
+                        <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="black">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {{ $tweet->users()->count() }}
+                      </button>
+                    </form>
+                    @endif
 
                     <!-- 条件分岐でログインしているユーザーが投稿したtweetのみ編集ボタンと削除ボタンが表示される-->
                     @if ($tweet->user_id === Auth::user()->id)
