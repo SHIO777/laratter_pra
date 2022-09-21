@@ -41,4 +41,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function userTweets()
+    {
+        return $this -> hasMany(Tweet::class);
+    }
+
+    public function tweets()
+    {
+        return $this -> belongsToMany(Tweet::class)
+                     -> withTimestamps();
+    }
+
+    public function followings()
+    {
+        // belongsToMany('関係するモデル', '中間テーブルのテーブル名', '中間テーブル内で対応しているID名', '関係するモデルで対応しているID名');
+        return $this -> belongsToMany(self::class, "follows", "user_id", "following_id")
+                     -> withTimestamps();
+    }
+
+    public function followers()
+    {
+        return $this -> belongsToMany(self::class, "follows", "following_id", "user_id")
+                     -> withTimestamps();
+    }
 }
