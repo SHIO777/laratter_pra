@@ -17,6 +17,7 @@
                             <label class="mb-2 uppercase font-bold text-lg text-grey-darkest" for="tweet">Tweet</label>
                             {{-- old('name')で前の入力値を引き継ぐ --}}
                             <input class="border py-2 px-3 text-grey-darkest" type="text" name="tweet" id="tweet" value="{{ old('tweet') }}">
+                            {{-- <input class="border py-2 px-3 text-grey-darkest" type="text" name="tweet" id="tweet"> --}}
                         </div>
                         <div class="flex flex-col mb-4">
                             <label class="mb-2 uppercase font-bold text-lg text-grey-darkest" for="description">Description</label>
